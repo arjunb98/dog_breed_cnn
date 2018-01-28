@@ -7,6 +7,7 @@ from keras.applications import ResNet50
 from keras.models import Sequential,load_model
 from keras.layers import Dense
 from keras.callbacks import ModelCheckpoint
+from keras import losses
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from DataGenerator import DataGenerator
 
@@ -25,7 +26,7 @@ def get_model(load_checkpoint):
 
     my_model.layers[0].trainable = False
 
-    my_model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
+    my_model.compile(optimizer='sgd', loss=losses.categorical_crossentropy, metrics=['accuracy'])
     return my_model
 
 
@@ -33,6 +34,7 @@ img_paths_total = ['../input/train/'+x for x in os.listdir("../input/train")]
 shuffle(img_paths_total)
 labels_df = pd.read_csv('../input/labels.csv')
 labels_list = list(set(labels_df['breed']))
+print(len(labels_list))
 class_dict = {breed:labels_list.index(breed) for breed in labels_list}
 labels_dict = {items[1]: items[2] for items in labels_df.itertuples()}
 y = np.array([class_dict[labels_dict[path[15:-4]]] for path in img_paths_total])
@@ -51,18 +53,18 @@ paramsTrain = {'dim_x': 224,
           'batch_size': 32,
           'shuffle': True,
           'margin': 100,
-          'random_location': True}
+          'random_location': False}
 paramsValid = {'dim_x': 224,
           'dim_y': 224,
           'dim_z': 3,
-          'batch_size': 32,
+          'batch_size': 16,
           'shuffle': True,
           'margin': 0,
-          'random_location': True}
+          'random_location': False}
 training_generator = DataGenerator(**paramsTrain).generate(labels['train'], partition['train'])
 validation_generator = DataGenerator(**paramsValid).generate(labels['validation'], partition['validation'])
 
-callbacks_list = [ ModelCheckpoint('resnet_baseline.h5', monitor='val_acc', save_best_only=True, mode='max', period=2) ]
+callbacks_list = [ ModelCheckpoint('resnet_baseline.h5', monitor='val_acc', save_best_only=False, mode='max', period=2) ]
 
 model = get_model(len(pretrained_model)>0)
 
@@ -71,4 +73,4 @@ model.fit_generator(generator = training_generator,
                         validation_data = validation_generator,
                         validation_steps = len(partition['validation'])//paramsValid['batch_size'],
                         epochs=40,
-                        verbose=2)
+                        verbose=1)

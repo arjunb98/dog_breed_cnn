@@ -18,10 +18,10 @@ class DataGenerator(object):
         self.shuffle = shuffle
         self.random_location = random_location
         self.margin = margin
-
     def generate(self, labels, list_IDs):
         # Generates batches of samples
         # Infinite loop
+
         while 1:
             # Generate order of exploration of dataset
             indexes = self.__get_exploration_order(list_IDs)
@@ -63,7 +63,7 @@ class DataGenerator(object):
 
         return preprocess_input(X), sparsify(y)
 
-def read_and_crop(filepath, left=None, top=None, random = True, margin = 0, width = 224, height = 224):
+def read_and_crop(filepath, left=None, top=None, random = False, margin = 0, width = 224, height = 224):
     im_array = np.array(Image.open((filepath)), dtype="uint8")
     pil_im = Image.fromarray(im_array)
     if left == None:
@@ -81,6 +81,6 @@ def read_and_crop(filepath, left=None, top=None, random = True, margin = 0, widt
 
 def sparsify(y):
     # Returns labels in binary NumPy array'
-    n_classes = 102
+    n_classes = 120
     return np.array([[1 if y[i] == j else 0 for j in range(n_classes)]
                    for i in range(y.shape[0])])
