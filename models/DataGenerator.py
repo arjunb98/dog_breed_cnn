@@ -6,6 +6,7 @@
 
 from random import randint
 import numpy as np
+import random
 from PIL import Image
 from keras.applications.resnet50 import preprocess_input
 class DataGenerator(object):
@@ -66,17 +67,12 @@ class DataGenerator(object):
 def read_and_crop(filepath, left=None, top=None, random = False, margin = 0, width = 224, height = 224):
     im_array = np.array(Image.open((filepath)), dtype="uint8")
     pil_im = Image.fromarray(im_array)
-    if left == None:
-        if random:
-            left = randint(margin, pil_im.size[0] - margin - width + 1)
-        else:
-            left = (pil_im.size[0] - width) // 2
-    if top == None:
-        if random:
-            top = randint(margin, pil_im.size[1] - margin - height + 1)
-        else:
-            top = (pil_im.size[1] - height) // 2
-    new_array = np.array(pil_im.crop((left,top,left+width,top+height)))
+    if random.random() <.5:
+        pil_im.transpose(Image.FLIP_LEFT_RIGHT)
+    # if random.random() <.5:
+    #     pil_im.putdata(Image.FLIP_LEFT_RIGHT)
+
+    new_array = np.array(pil_im.resize((width,height)))
     return new_array
 
 def sparsify(y):
