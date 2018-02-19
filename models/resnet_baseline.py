@@ -13,7 +13,7 @@ from DataGenerator import DataGenerator
 seed(42)
 image_size = 224
 num_classes = 120
-validation_size = 1022
+validation_size = 2024
 pretrained_model = ''
 
 
@@ -23,11 +23,11 @@ def get_model(load_checkpoint):
         return load_model(pretrained_model)
     my_model = Sequential()
     my_model.add(ResNet50(include_top=False, pooling='avg', weights='imagenet'))
-    my_model.add(Dropout(.1))
+    my_model.add(Dropout(.2))
     my_model.add(Dense(num_classes, activation='softmax', use_bias=True))
 
     my_model.layers[0].trainable = False
-    sgd = optimizers.SGD(lr=0.0001, momentum=.9)
+    sgd = optimizers.SGD(lr=0.001, momentum=.9)
     my_model.compile(optimizer=sgd, loss=losses.categorical_crossentropy, metrics=['accuracy'])
     return my_model
 
@@ -54,7 +54,7 @@ labels = {'train': trainLabels, 'validation': validationLabels}
 paramsTrain = {'dim_x': 224,
           'dim_y': 224,
           'dim_z': 3,
-          'batch_size': 22,
+          'batch_size': 16,
           'shuffle': True,
           'margin': 100,
           'random_location': True}
@@ -76,6 +76,6 @@ model.fit_generator(generator = training_generator,
                         steps_per_epoch = len(partition['train'])//paramsTrain['batch_size'],
                         validation_data = validation_generator,
                         validation_steps = len(partition['validation'])//paramsValid['batch_size'],
-                        epochs=30,
+                        epochs=10,
                         verbose=1)
-model.save('resnet_baseline_epoch30.h5')
+model.save('resnet_baseline_epoch15.h5')
