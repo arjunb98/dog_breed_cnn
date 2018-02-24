@@ -9,6 +9,7 @@ import numpy as np
 import random
 from PIL import Image
 from keras.applications.resnet50 import preprocess_input
+# from keras.applications.inception_v3 import preprocess_input
 class DataGenerator(object):
 
     def __init__(self, dim_x = 224, dim_y = 224, dim_z = 3, batch_size = 32, margin=100, shuffle = True, random_location = True):
@@ -66,11 +67,13 @@ class DataGenerator(object):
 def read_and_crop(filepath, left=None, top=None, random = False, margin = 0, width = 224, height = 224):
     im_array = np.array(Image.open((filepath)), dtype="uint8")
     pil_im = Image.fromarray(im_array)
-    if randint(0, 1) == 1:
-        pil_im.transpose(Image.FLIP_LEFT_RIGHT)
-    # if random.random() <.5:
-    #     pil_im.putdata(Image.FLIP_LEFT_RIGHT)
-
+    if random:
+        if randint(0, 1) == 1:
+            pil_im.transpose(Image.FLIP_LEFT_RIGHT)
+        if randint(0, 1) == 1:
+            pil_im.transpose(Image.FLIP_TOP_BOTTOM)
+        if randint(0,1) == 1:
+            pil_im.rotate(randint(-40,40))
     new_array = np.array(pil_im.resize((width,height)))
     return new_array
 

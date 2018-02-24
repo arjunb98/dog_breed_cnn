@@ -13,7 +13,7 @@ from DataGenerator import DataGenerator
 seed(42)
 image_size = 224
 num_classes = 120
-validation_size = 2024
+validation_size = 0
 pretrained_model = ''
 
 
@@ -23,7 +23,7 @@ def get_model(load_checkpoint):
         return load_model(pretrained_model)
     my_model = Sequential()
     my_model.add(ResNet50(include_top=False, pooling='avg', weights='imagenet'))
-    my_model.add(Dropout(.5))
+    my_model.add(Dropout(.2))
     my_model.add(Dense(num_classes, activation='softmax', use_bias=True))
 
     my_model.layers[0].trainable = False
@@ -66,7 +66,7 @@ paramsValid = {'dim_x': 224,
           'margin': 0,
           'random_location': False}
 training_generator = DataGenerator(**paramsTrain).generate(labels['train'], partition['train'])
-validation_generator = DataGenerator(**paramsValid).generate(labels['validation'], partition['validation'])
+# validation_generator = DataGenerator(**paramsValid).generate(labels['validation'], partition['validation'])
 
 callbacks_list = [ ModelCheckpoint('resnet_baseline.h5', monitor='val_acc', save_best_only=False, mode='max', period=2) ]
 
@@ -74,8 +74,7 @@ model = get_model(len(pretrained_model)>0)
 
 model.fit_generator(generator = training_generator,
                         steps_per_epoch = len(partition['train'])//paramsTrain['batch_size'],
-                        validation_data = validation_generator,
                         validation_steps = len(partition['validation'])//paramsValid['batch_size'],
                         epochs=10,
                         verbose=1)
-model.save('resnet_baseline_epoch10_dr5.h5')
+model.save('resnet_baseline_epoch10_dr2_alldata.h5')

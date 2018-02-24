@@ -3,14 +3,14 @@ import numpy as np
 from PIL import Image
 from random import shuffle, randint, seed
 import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
-from keras.applications import ResNet50
+from keras.applications import InceptionV3
 from keras.models import Sequential,load_model
 from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint
 from keras import losses, optimizers
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from DataGenerator import DataGenerator
-seed(42)
+seed(420)
 image_size = 224
 num_classes = 120
 validation_size = 2024
@@ -22,8 +22,8 @@ def get_model(load_checkpoint):
         print('loading model')
         return load_model(pretrained_model)
     my_model = Sequential()
-    my_model.add(ResNet50(include_top=False, pooling='avg', weights='imagenet'))
-    my_model.add(Dropout(.5))
+    my_model.add(InceptionV3(include_top=False, pooling='avg', weights='imagenet'))
+    my_model.add(Dropout(.3))
     my_model.add(Dense(num_classes, activation='softmax', use_bias=True))
 
     my_model.layers[0].trainable = False
@@ -78,4 +78,4 @@ model.fit_generator(generator = training_generator,
                         validation_steps = len(partition['validation'])//paramsValid['batch_size'],
                         epochs=10,
                         verbose=1)
-model.save('resnet_baseline_epoch10_dr5.h5')
+model.save('inception_baseline2_epoch10_dr3.h5')
